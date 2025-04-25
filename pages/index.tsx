@@ -9,7 +9,7 @@ export default function Home() {
       </Head>
       <main>
         <h1 style={{ textAlign: 'center', marginTop: '100px' }}>
-          Witaj na stronie sasiedzi.pl! 🎉
+          Witaj na stronie sasiedzi.pl! 🎉!
         </h1>
       </main>
     </>
