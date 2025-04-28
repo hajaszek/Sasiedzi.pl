@@ -1,20 +1,38 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function Chat() {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [messages, setMessages] = useState<string[]>([]);
   const [newMessage, setNewMessage] = useState<string>('');
+  const ws = useRef<WebSocket | null>(null);
 
   const users = ['Jan Kowalski', 'Anna Nowak', 'Grupa Sąsiedzi z Łęcznej'];
 
+  useEffect(() => {
+    if (selectedUser) {
+      ws.current = new WebSocket('ws://localhost:3001');
+
+      ws.current.onmessage = (event) => {
+        const receivedMessage = event.data;
+        setMessages((prev) => [...prev, receivedMessage]);
+      };
+
+      return () => {
+        ws.current?.close();
+      };
+    }
+  }, [selectedUser]);
+
   const handleSelectUser = (user: string) => {
     setSelectedUser(user);
-    setMessages([]); // Nowa rozmowa = pusta historia
+    setMessages([]);
   };
 
   const handleSendMessage = () => {
     if (newMessage.trim() !== '') {
-      setMessages([...messages, `Ty: ${newMessage}`]);
+      const messageToSend = `Ty: ${newMessage}`;
+      setMessages((prev) => [...prev, messageToSend]);
+      ws.current?.send(messageToSend);
       setNewMessage('');
     }
   };
